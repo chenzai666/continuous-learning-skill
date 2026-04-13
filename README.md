@@ -100,7 +100,7 @@ cat ~/.openclaw/workspace/MEMORY.md | tail -20
 
 ### LLM 提供商配置
 
-**LongCat（推荐）**
+**LongCat（Free 推荐）**
 ```json
 {
   "provider": "longcat",
