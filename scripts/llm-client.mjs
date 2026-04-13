@@ -36,6 +36,8 @@ export async function analyzeConversation(messages, config = null) {
       return await analyzeWithOpenAI(messages, config);
     case 'anthropic':
       return await analyzeWithAnthropic(messages, config);
+    case 'longcat':
+      return await analyzeWithLongCat(messages, config);
     default:
       throw new Error(`Unknown LLM provider: ${provider}`);
   }
@@ -132,6 +134,48 @@ async function analyzeWithAnthropic(messages, config) {
   
   const data = await response.json();
   const content = data.content[0]?.text;
+  
+  // 提取 JSON 部分
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    return JSON.parse(jsonMatch[0]);
+  }
+  
+  throw new Error('Could not parse LLM response as JSON');
+}
+
+/**
+ * 使用 LongCat API 分析
+ */
+async function analyzeWithLongCat(messages, config) {
+  const apiKey = process.env.LONGCAT_API_KEY || 'ak_2fl4Ax1K02zv02r1Wa24164876o6H';
+  const model = config.llm?.model || 'LongCat-Flash-Lite';
+  
+  const prompt = buildAnalysisPrompt(messages);
+  
+  const response = await fetch('https://api.longcat.chat/openai/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [
+        { role: 'system', content: '你是一个对话分析助手，擅长从对话中提取关键信息。' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: config.llm?.temperature || 0.3,
+      max_tokens: config.llm?.max_tokens_per_analysis || 2000
+    })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`LongCat API error: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  const content = data.choices[0]?.message?.content;
   
   // 提取 JSON 部分
   const jsonMatch = content.match(/\{[\s\S]*\}/);
