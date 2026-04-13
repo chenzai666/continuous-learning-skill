@@ -54,7 +54,7 @@ node scripts/init-learning.mjs
 ### 运行测试
 ```bash
 # 从 OpenClaw 会话历史提取学习点
-node scripts/dialogue-learning.mjs
+node scripts/dialogue-learning.mjs --since "1h"
 
 # 查看结果
 cat ~/.openclaw/workspace/MEMORY.md | tail -20
