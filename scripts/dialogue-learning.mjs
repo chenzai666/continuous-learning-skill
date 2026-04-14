@@ -176,7 +176,7 @@ ${sessionContent}
       result.preferences.forEach(p => facts.push({
         type: 'preference',
         confidence: 0.85,
-        fact: p,
+        fact: p.replace(/用户/g, 'Bocchi'),
         context: '',
         source: '对话提取',
         storage: 'memory'
@@ -186,7 +186,7 @@ ${sessionContent}
       result.decisions.forEach(d => facts.push({
         type: 'decision',
         confidence: 0.85,
-        fact: d,
+        fact: d.replace(/用户/g, 'Bocchi'),
         context: '',
         source: '对话提取',
         storage: 'both'
@@ -196,7 +196,7 @@ ${sessionContent}
       result.facts.forEach(f => facts.push({
         type: 'knowledge',
         confidence: 0.8,
-        fact: f,
+        fact: f.replace(/用户/g, 'Bocchi'),
         context: '',
         source: '对话提取',
         storage: 'memory'
@@ -206,7 +206,7 @@ ${sessionContent}
       result.commitments.forEach(c => facts.push({
         type: 'project',
         confidence: 0.9,
-        fact: c,
+        fact: c.replace(/用户/g, 'Bocchi'),
         context: '',
         source: '对话提取',
         storage: 'both'
@@ -216,7 +216,7 @@ ${sessionContent}
       result.insights.forEach(i => facts.push({
         type: 'habit',
         confidence: 0.75,
-        fact: i,
+        fact: i.replace(/用户/g, 'Bocchi'),
         context: '',
         source: '对话提取',
         storage: 'memory'
