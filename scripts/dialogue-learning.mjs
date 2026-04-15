@@ -151,8 +151,10 @@ async function extractLearningPoints(sessionContent) {
 ]
 
 **规则**：
-- 只提取高置信度（≥0.7）的事实
+- 只提取高置信度（≥0.8）的事实
 - 避免临时性、上下文依赖的信息
+- **不记录**：具体技术操作（如"重启gateway"、"运行命令"）、单次事件、故障处理过程
+- **只记录**：稳定的偏好（如喜欢什么信息展示方式）、行为模式（如如何学习/整理知识）、重要决策（如何处理问题的原则）
 - 事实应简洁、原子化
 - storage建议: 简短存memory，详细存obsidian，重要存both
 
@@ -223,7 +225,19 @@ ${sessionContent}
       }));
     }
     
-    return facts.filter(f => f.confidence >= CONFIG.minConfidence);
+    // 过滤掉无营养的具体操作
+    const skipPatterns = [
+      '重启gateway', '决定重启gateway', '重启 gateway',
+      'gateway挂掉', 'gateway崩溃', 'gateway莫名其妙',
+    ];
+    return facts.filter(f => {
+      if (f.confidence < CONFIG.minConfidence) return false;
+      const text = f.fact.toLowerCase();
+      for (const pattern of skipPatterns) {
+        if (text.includes(pattern.toLowerCase())) return false;
+      }
+      return true;
+    });
   } catch (err) {
     console.error('❌ LLM call failed:', err.message);
     console.log('⚠️ Falling back to mock data');
